@@ -7,7 +7,7 @@ require __DIR__ . "/vendor/autoload.php";
 $client = new GuzzleHttp\Client;
 $response = $client->request("GET", "https://api.github.com/user/repos", [
     "headers" => [
-        "Authorization" => "token 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",
+        "Authorization" => "token enter_your_githubaccesstoken",
         "User-Agent" => "hasanhafiz"
     ]
 ]); 
