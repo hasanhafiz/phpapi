@@ -12,7 +12,7 @@ $path = $_SERVER["REQUEST_URI"];
 $path = parse_url( $path, PHP_URL_PATH );
 
 $parts = explode("/", $path);
-
+ 
  // items 2 i.e index 2 is resource
 
 $resource = $parts[2];
@@ -35,10 +35,6 @@ $codec = new JWTCodec( $_ENV["SECRET_KEY"] );
 
 $auth = new Auth( $user_gateway, $codec );
 
-// if ( ! $auth->authenticateAPIKey() ) {
-//     exit;
-// }
-
 // instead of api key, we are not validation user by token
 if ( ! $auth->authenticateAccessToken() ) {
     exit;
@@ -47,6 +43,7 @@ if ( ! $auth->authenticateAccessToken() ) {
 $user_id = $auth->getUserId();
 
 // var_dump( $user_id );
+// exit;
 
 // echo dirname(__DIR__); // returns parent directory
 // require dirname(__DIR__) . "/src/TaskController.php";

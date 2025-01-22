@@ -51,8 +51,8 @@ class TaskGateway {
     }
     
     public function create( array $data ): int {
-        $sql = "INSERT INTO task (name, priority, is_completed)
-                            VALUES(:name, :priority, :is_completed) ";
+        $sql = "INSERT INTO task (name, priority, is_completed, user_id)
+                            VALUES(:name, :priority, :is_completed, :user_id) ";
         $stmt = $this->conn->prepare( $sql  );
         
         if ( empty( $data["priority"] ) ) {
@@ -63,6 +63,7 @@ class TaskGateway {
         
         $stmt->bindValue(":name", $data["name"], PDO::PARAM_STR);        
         $stmt->bindValue(":is_completed", $data["is_completed"] ?? false, PDO::PARAM_BOOL);
+        $stmt->bindValue(":user_id", $data["user_id"] ?? false, PDO::PARAM_BOOL);
         
         $stmt->execute();
         return $this->conn->lastInsertId();

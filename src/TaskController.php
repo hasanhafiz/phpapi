@@ -3,12 +3,15 @@
 class TaskController {
     
     private $gateway;
-    public function __construct(TaskGateway $gateway, private int $user_id) {
+    
+    private int $user_id;
+    public function __construct(TaskGateway $gateway, int $user_id) {
         $this->gateway = $gateway;
+        $this->user_id = $user_id;
     }
     
     public function processRequest(string $method, ?string $id ): void {
-
+        
         if ( $id === null ) {
             if ( $method == "GET" ) {
                 echo json_encode( $this->gateway->getAllForUser( $this->user_id ) );
@@ -20,6 +23,7 @@ class TaskController {
                     $this->respondUnprocessableEntity( $errors );
                     return;
                 }
+                $data["user_id"] = $this->user_id;
                 $id = $this->gateway->create( $data );
                 $this->respondCreated( $id );                
             } else {
