@@ -4,7 +4,8 @@ class Auth {
     
     private int $user_id;
     
-    public function __construct(private UserGateway $user_gateway) {
+    public function __construct(private UserGateway $user_gateway,
+                                private JWTCodec $codec) {
     }
     
     public function authenticateAPIKey(): bool {
@@ -41,6 +42,35 @@ class Auth {
             echo json_encode(["message" => "Incomplete authorization header"]);
             return false;
         }
+        
+        try {
+            $data = $this->codec->decode( $matches[1] ); // returns payload
+        } catch ( TokenExpiredException ) {
+            http_response_code(401);
+            echo json_encode( ["message" => "Token has expired!"] );
+            return false;            
+        } catch ( InvalidSignatureException ) {
+            http_response_code(401);
+            echo json_encode( ["message" => "Invalid signature"] );
+            return false;
+        } catch (Exception $e) {
+            http_response_code(400);
+            echo json_encode( ["message" => $e->getMessage()] );
+            return false;
+        }
+        
+        $this->user_id = $data["sub"]; // previously, we rename id to sub
+        return true;
+    }
+    
+    public function authenticateAccessTokenOld(): bool {
+        // var_dump( $_SERVER["HTTP_AUTHORIZATION"] );
+        
+        if ( ! preg_match("/^Bearer\s+(.*)$/", $_SERVER["HTTP_AUTHORIZATION"], $matches) ) {
+            http_response_code(400); // 400 Bad Request
+            echo json_encode(["message" => "Incomplete authorization header"]);
+            return false;
+        }
         $plain_text = base64_decode( $matches[1], true );
         if ( $plain_text === false ) {
             http_response_code(400); // 400 Bad Request
@@ -57,5 +87,5 @@ class Auth {
         
         $this->user_id = $data["id"];
         return true;
-    }
+    }    
 }

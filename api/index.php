@@ -31,7 +31,9 @@ if ( $resource != 'tasks' ) {
 $database = new Database($_ENV["DB_HOST"], $_ENV["DB_NAME"],$_ENV["DB_USER"],$_ENV["DB_PASSWORD"]);
 $user_gateway = new UserGateway( $database );
 
-$auth = new Auth( $user_gateway );
+$codec = new JWTCodec( $_ENV["SECRET_KEY"] );
+
+$auth = new Auth( $user_gateway, $codec );
 
 // if ( ! $auth->authenticateAPIKey() ) {
 //     exit;

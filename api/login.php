@@ -46,15 +46,12 @@ if ( ! password_verify( $data["password"], $user["password_hash"] ) ){
     exit;    
 }
 
-$payload = [
-    "sub" => $user["id"],
-    "name" => $user["name"] 
-];
+$codec = new JWTCodec($_ENV["SECRET_KEY"]);
 
-// $access_token = base64_encode( json_encode( $payload ) );
-$access_token = (new JWTCodec($_ENV["SECRET_KEY"]))->encode( $payload );
-// echo $access_token , "\n";
+require __DIR__ . "/tokens.php";
 
-// echo base64_decode( $access_token ) , "\n";
-echo json_encode(["access_token" => $access_token, "message" => "Successful authentication"]);
-
+// save new token & refresh token to database
+$refresh_token_gateway = new RefreshTokenGateway( $database, $_ENV["SECRET_KEY"] );
+// these two parameters are difined in 'tokens.php' file
+$token_create = $refresh_token_gateway->create( $refresh_token, $refresh_token_expiry ); 
+// var_dump( $token_create );
